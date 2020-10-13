@@ -107,7 +107,10 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
 
-              Image.asset('assets/rolling-dices.png', height: 150,),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 30),
+                child: Image.asset('assets/rolling-dices.png', height: 150,),
+              ),
 
               Tracker(label: 'Successes', value: _successes, onChange: (delta) {
                 _incrementSuccesses(delta);

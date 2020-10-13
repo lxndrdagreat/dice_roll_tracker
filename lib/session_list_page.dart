@@ -95,25 +95,30 @@ class _SessionListPageState extends State {
       appBar: AppBar(
         title: Text('Session History')
       ),
-      body: ListView.builder(
-        itemCount: _sessions.length,
-        itemBuilder: (context, index) {
-          final item = _sessions[index];
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 678, minWidth: 200),
+          child: ListView.builder(
+            itemCount: _sessions.length,
+            itemBuilder: (context, index) {
+              final item = _sessions[index];
 
-          final total = item.failures + item.successes;
-          final rate = total == 0 ? 0 : (item.successes / total) * 100;
+              final total = item.failures + item.successes;
+              final rate = total == 0 ? 0 : (item.successes / total) * 100;
 
-          return ListTile(
-            title: Text('${item.date.year}-${item.date.month}-${item.date.day}'),
-            subtitle: Text('${rate.toStringAsFixed(2)}% success'),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _deleteSession(context, index);
-              },
-            ),
-          );
-        },
+              return ListTile(
+                title: Text('${item.date.year}-${item.date.month}-${item.date.day}'),
+                subtitle: Text('${rate.toStringAsFixed(2)}% success'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _deleteSession(context, index);
+                  },
+                ),
+              );
+            },
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.delete),
