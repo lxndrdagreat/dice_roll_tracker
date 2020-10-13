@@ -21,7 +21,7 @@ class Tracker extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              FloatingActionButton(
+              ElevatedButton(
                 child: Icon(Icons.remove),
                 onPressed: () {
                   onChange(-1);
@@ -38,7 +38,7 @@ class Tracker extends StatelessWidget {
                 ),
               ),
 
-              FloatingActionButton(
+              ElevatedButton(
                 child: Icon(Icons.add),
                 onPressed: () {
                   onChange(1);

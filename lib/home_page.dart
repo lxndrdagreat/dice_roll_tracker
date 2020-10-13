@@ -1,9 +1,13 @@
 import 'dart:math';
+import 'package:dice_roll_tracker/session_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:dice_roll_tracker/tracker.dart';
 import 'package:dice_roll_tracker/state_handler.dart';
 
 class MyHomePage extends StatefulWidget {
+
+  static const String ROUTE = '/';
+
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -23,24 +27,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadState() async {
-    final state = await loadSavedState();
+    final session = await activeSession();
     setState(() {
-      _successes = state.successes;
-      _failures = state.failures;
+      _successes = session.successes;
+      _failures = session.failures;
     });
   }
 
   void _incrementSuccesses([int delta = 1]) {
     setState(() {
       _successes = max(0, _successes + delta);
-      saveState(_successes, _failures);
+      saveSession(_successes, _failures);
     });
   }
 
   void _incrementFailures([int delta = 1]) {
     setState(() {
       _failures = max(0, _failures + delta);
-      saveState(_successes, _failures);
+      saveSession(_successes, _failures);
     });
   }
 
@@ -52,36 +56,32 @@ class _MyHomePageState extends State<MyHomePage> {
     return (_successes / total) * 100;
   }
 
-  void _clearState() {
-    clearState()
-        .then((value) => _loadState());
-  }
-
-  _showAlertDialog(BuildContext context) {
+  _showConfirmCreateNewDialog(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Reset Rolls?'),
-          content: Text('Are you sure you want to reset?'),
-          actions: [
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-            ),
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Start new session?'),
+            content: Text('Archive this session and start a new one?'),
+            actions: [
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+              ),
 
-            FlatButton(
-              child: Text('Continue'),
-              onPressed: () {
-                _clearState();
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-            )
-          ],
-        );
-      }
+              FlatButton(
+                child: Text('Continue'),
+                onPressed: () async {
+                  await createNewSession();
+                  await _loadState();
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+              )
+            ],
+          );
+        }
     );
   }
 
@@ -92,9 +92,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_forever_outlined),
-            onPressed: () {
-              _showAlertDialog(context);
+            icon: Icon(Icons.list),
+            onPressed: () async {
+              // wait for the view to return and refresh state
+              await Navigator.of(context).pushNamed(SessionListPage.ROUTE);
+              await _loadState();
             },
           )
         ],
@@ -136,6 +138,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          _showConfirmCreateNewDialog(context);
+        },
       ),
     );
   }
